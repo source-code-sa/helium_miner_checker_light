@@ -25,6 +25,7 @@ Preface: (app is installed in "/mnt/data/hmc_app" location on the SD card)
 1) /bin/bash /mnt/data/hmc_app.sh [option]
 
   [options]:
+  
             * p2p-status      Get p2p status of your miner
             * gossip-peers    Print list of your Gossip Peers
             * peer-refresh    Request an updated peerbook for this peer from our gossip peers
