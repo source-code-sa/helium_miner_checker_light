@@ -30,7 +30,7 @@ Preface: (app is installed in "/mnt/data/hmc_app" location on the SD card)
             * gossip-peers    Print list of your Gossip Peers
             * peer-refresh    Request an updated peerbook for this peer from our gossip peers
             * relay-reset     Stop the current libp2p relay swarm and retry
-            * deamon-restart  Restart the miner application instances and deamons inside the miner virtual machine
+            * deamon-restart  Restart the miner application instances and deamons inside the miner virtual machine. This option keeps your miner blocks current, both helium dashboard and or sensecapmx dashboard will not report any blockchain height difference nor your miner uptime on helium/sensecapmx dashboard will be disrupted.
             * vm-restart      Restart the miner virtual machine
             * log-analyzer    Miner witness/beacon/challenger statistics
             
