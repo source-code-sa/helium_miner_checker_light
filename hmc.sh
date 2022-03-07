@@ -6,10 +6,19 @@ miner_vm_name=$(balena ps | grep "miner_" | awk -F' ' '{print $10}')
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
 #device_address=$(curl -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" -H "Content-Type: application/json" -H "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:97.0) Gecko/20100101 Firefox/97.0" https://api.helium.io/v1/hotspots/name/$miner_animal_name | awk -F'":"' '{print $20}' | rev | cut -c5- | rev)
 get_console_log=$(find /mnt/data -name "console.log")
-total_witnesses=$(cat $get_console_log | grep -c 'sending witness at RSSI')
+total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c ':')
 successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
 failedtodial_witnesses=$(cat $get_console_log | grep -c 'failed to dial challenger')
+resending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 're-sending')
+sending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 'sending')
 failedtosendresend_witnesses=$(cat $get_console_log | grep -c 'failed to send witness, max retry')
+relaytransported_total=$(cat $get_console_log | egrep -w '@libp2p_transport_relay:connect_to:' | grep -c ':')
+challenger_notfound=$(cat $get_console_log | egrep 'not_found' | grep -c 'failed to dial challenger')
+challenger_timeout=$(cat $get_console_log | egrep 'timeout' | grep -c 'failed to dial challenger')
+challenger_refused=$(cat $get_console_log | egrep 'econnrefused' | grep -c 'failed to dial challenger')
+challenger_unreachable=$(cat $get_console_log | egrep 'ehostunreach' | grep -c 'failed to dial challenger')
+challenger_nolistenaddr=$(cat $get_console_log | egrep 'no_listen_addr' | grep -c 'failed to dial challenger') 
+#
 #
 echo "****************************************************************************"
 echo "Performing actions on Node:"
@@ -29,15 +38,25 @@ elif [ $1 == "relay-reset"  ]; then
 	balena exec $miner_vm_name miner peer relay_reset
 elif [ $1 == "deamon-restart" ]; then
 	balena exec $miner_vm_name miner restart
+	echo 'wait 30 seconds before running any further HMC commands to allow the miner deamon services to finish loading'
 elif [ $1 == "vm-restart" ]; then
 	balena exec $miner_vm_name miner reboot
+	echo 'wait 1 minute before running any further HMC commands to allow the miner VM to boot up again and deamon services to finish loading'
 elif [ $1 == "log-analyzer" ]; then
 	echo '******************************************************************'
 	echo 'Total Witnessed:                                    = '$total_witnesses
+	echo '               |-- Sending:                         = '$(($sending_witnesses-$resending_witnesses))
+	echo '               |-- Resending:                       = '$resending_witnesses
 	echo 'Successful:                                         = '$successful_witnesses ' (' $(($successful_witnesses*100/$total_witnesses))'%)'
 	echo 'Unreachable:                                        = '$failedtodial_witnesses ' (' $(($failedtodial_witnesses*100/$total_witnesses))'%)'
 	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $((failedtosendresend_witnesses*100/$total_witnesses))'%)'
 	echo 'Other (Witness Failures):                           = '$(($total_witnesses-($successful_witnesses+$failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $(( ($total_witnesses-($successful_witnesses+$failedtodial_witnesses+$failedtosendresend_witnesses))*100/$total_witnesses))'%)'
+	echo 'Challenger Issues:'
+	echo '               |-- Challenger Not Found:            = '$challenger_notfound
+	echo '               |-- Challenger Timed Out:            = '$challenger_timeout
+	echo '               |-- Challenger Refused Connection:   = '$challenger_refused
+	echo '               |-- Challenger Unreachable:          = '$challenger_unreachable
+	echo '               |-- Challenger No Listening Address: = '$challenger_nolistenaddr
 	echo '******************************************************************'
 else
 	echo "Bye"
