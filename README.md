@@ -59,9 +59,26 @@ Usage Examples:
 
   /bin/bash /mnt/data/hmc_app.sh log-analyzer
   
-            Total Witnessed:                                    = 76
-            Successful:                                         = 6  ( 7%)
-            Unreachable:                                        = 54  ( 71%)
-            Send or Re-send Failed:                             = 5  ( 6%)
-            Other (Witness Failures):                           = 11  ( 14%)
+          Performing actions on Node:
+          VM: miner_4633499_2090301
+          Animal Name: soaring-champagne-jellyfish
+          Log Location: /mnt/data/docker/volumes/1851574_miner-log/_data/console.log
+          ****************************************************************************
 
+          ******************************************************************
+          Total Witnessed:                                    = 102
+                         |-- Sending:                         = 10
+                         |-- Resending:                       = 41
+          Successful:                                         = 6  ( 5%)
+          Unreachable:                                        = 42  ( 41%)
+          Send or Re-send Failed:                             = 3  ( 2%)
+          Other (Witness Failures):                           = 51  ( 50%)
+          Challenger Issues:
+                         |-- Challenger Not Found:            = 33
+                         |-- Challenger Timed Out:            = 9
+                         |-- Challenger Refused Connection:   = 0
+                         |-- Challenger Unreachable:          = 0
+                         |-- Challenger No Listening Address: = 0
+          ******************************************************************
+          
+          
