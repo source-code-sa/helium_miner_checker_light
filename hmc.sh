@@ -5,7 +5,7 @@
 miner_vm_name=$(balena ps | egrep "miner_" | awk '{print $NF}')
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
 get_console_log=$(find /mnt/data -name "console.log")
-total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c ':')
+total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:decrypt:' | grep -c ':')
 successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
 failedtodial_witnesses=$(cat $get_console_log | grep -c 'failed to dial challenger')
 resending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 're-sending')
