@@ -2,9 +2,8 @@
 #!/bin/sh
 #
 # spot for varaiables that will be needed
-miner_vm_name=$(balena ps | grep "miner_" | awk -F' ' '{print $10}')
+miner_vm_name=$(balena ps | egrep "miner_" | awk '{print $NF}')
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
-#device_address=$(curl -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" -H "Content-Type: application/json" -H "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:97.0) Gecko/20100101 Firefox/97.0" https://api.helium.io/v1/hotspots/name/$miner_animal_name | awk -F'":"' '{print $20}' | rev | cut -c5- | rev)
 get_console_log=$(find /mnt/data -name "console.log")
 total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c ':')
 successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
