@@ -17,6 +17,16 @@ challenger_timeout=$(cat $get_console_log | egrep 'timeout' | grep -c 'failed to
 challenger_refused=$(cat $get_console_log | egrep 'econnrefused' | grep -c 'failed to dial challenger')
 challenger_unreachable=$(cat $get_console_log | egrep 'ehostunreach' | grep -c 'failed to dial challenger')
 challenger_nolistenaddr=$(cat $get_console_log | egrep 'no_listen_addr' | grep -c 'failed to dial challenger') 
+peer_activity_list=$(cat $get_console_log | egrep -w '@libp2p_group_worker:connecting:' | grep -c ':')
+peer_normal_exit=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'exit,{normal')
+peer_timeout=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'timeout')
+peer_timeout_proxy_session=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'timeout_proxy_session')
+peer_timeout_relay_session=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'timeout_relay_session')
+peer_closed=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'closed')
+peer_not_found=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'not_found')
+peer_server_down=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'server_down')
+peer_fail_dial_proxy=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'fail_dial_proxy')
+peer_econnrefused=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'econnrefused')
 #
 #
 echo "****************************************************************************"
@@ -48,14 +58,24 @@ elif [ $1 == "log-analyzer" ]; then
 	echo '               |-- Resending:                       = '$resending_witnesses
 	echo 'Successful:                                         = '$successful_witnesses ' (' $(($successful_witnesses*100/$total_witnesses))'%)'
 	echo 'Unreachable:                                        = '$failedtodial_witnesses ' (' $(($failedtodial_witnesses*100/$total_witnesses))'%)'
-	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $((failedtosendresend_witnesses*100/$total_witnesses))'%)'
-	echo 'Other (Witness Failures):                           = '$(($total_witnesses-($successful_witnesses+$failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $(( ($total_witnesses-($successful_witnesses+$failedtodial_witnesses+$failedtosendresend_witnesses))*100/$total_witnesses))'%)'
+	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $((failedtosendresend_witnesses*100/$sending_witnesses))'%)'
+	echo 'Other (Witness Failures):                           = '$(($sending_witnesses-($failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $(( ($sending_witnesses-(+$failedtodial_witnesses+$failedtosendresend_witnesses))*100/$total_witnesses))'%)'
 	echo 'Challenger Issues:'
 	echo '               |-- Challenger Not Found:            = '$challenger_notfound
 	echo '               |-- Challenger Timed Out:            = '$challenger_timeout
 	echo '               |-- Challenger Refused Connection:   = '$challenger_refused
 	echo '               |-- Challenger Unreachable:          = '$challenger_unreachable
 	echo '               |-- Challenger No Listening Address: = '$challenger_nolistenaddr
+	echo 'Total Peer Activity:                                = '$peer_activity_list
+	echo '               |-- Timeouts:                        = '$peer_timeout
+	echo '               |-- Proxy Session Timeouts:          = '$peer_timeout_proxy_session
+	echo '               |-- Relay Session Timeouts:          = '$peer_timeout_relay_session
+	echo '               |-- Normal Exit:                     = '$peer_normal_exit
+	echo '               |-- Not Found:                       = '$peer_not_found
+	echo '               |-- Server Down:                     = '$peer_server_down
+	echo '               |-- Failed to Dial Proxy:            = '$peer_fail_dial_proxy
+	echo '               |-- Connection Refused:              = '$peer_econnrefused
+	echo '               |-- Connection Closed:               = '$peer_closed
 	echo '******************************************************************'
 else
 	echo "Bye"
