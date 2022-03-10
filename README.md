@@ -16,30 +16,36 @@ Please use the following commands to place this script in a persistent storage l
 1) SSH into your miner
 2) Run the following:
                       cd /mnt/data/ && mkdir hmc_app && cd hmc_app && rm -rf hmc.sh && wget https://github.com/saad-akhtar/helium_miner_checker/hmc.sh
+                      rm -rf gpp.sh && wget https://github.com/saad-akhtar/helium_miner_checker/blob/main/gpp.sh
 3) Congratulations....! Helium miner checker (HMC) is now installed and ready to rock your miner data game.....
 4) To run the application is even simpler. Check out 'apprun' section below for a full list of usage commands/switches
 
 AppRun:
 
 Preface: (app is installed in "/mnt/data/hmc_app" location on the SD card)
-1) /bin/bash /mnt/data/hmc_app.sh [option]
+1) cd /mnt/data/hmc_app
+2) /bin/bash hmc_app.sh [option]
 
   [options]:
   
             * p2p-status      Get p2p status of your miner
-            * gossip-peers    Print list of your Gossip Peers
-            * peer-refresh    Request an updated peerbook for this peer from our gossip peers
+            * gossip-peers    Ping gossip peers and display out peer/line.
+                              This switch will intiate gpp.sh and commit operation unit control is had back to hmc.sh
+            * peer-refresh    Request an updated peerbook for this peer from a target gossip peer
+                                    /bin/bash hmc.sh peer-refresh /p2p/112VfWsvN5PzGfH9Wxi7rnxPfsvJSxRP8JuSfRp124wRmCFRqA5Q
             * relay-reset     Stop the current libp2p relay swarm and retry
             * deamon-restart  Restart the miner application instances and deamons inside the miner virtual machine. 
                               This option keeps your miner blocks current, both helium dashboard and or sensecapmx 
                               dashboard will not report any blockchain height difference nor your miner uptime on 
                               helium/sensecapmx dashboard will be disrupted.
-            * vm-restart      Restart the miner virtual machine.
-            * log-analyzer    Miner witness/beacon/challenger statistics
-            
+            * vm-restart      Restart the miner virtual machine. Seems to be most effective and also necessary after any sys.config changes.
+            * log-analyzer    Miner witness/beacon/challenger/p2p statistics
+ 
+3) /bin/bash gpp.sh           [if you wish to run the ping tool as standalone]
+ 
 Usage Examples:
 
-  /bin/bash /mnt/data/hmc_app.sh p2p-status
+  /bin/bash hmc.sh p2p-status
 
             +---------+-------+
             |  name   |result |
@@ -50,35 +56,56 @@ Usage Examples:
             | height  |1255848|
             +---------+-------+
 
-  /bin/bash /mnt/data/hmc_app.sh gossip-peers
+  /bin/bash hmc.sh gossip-peers
   
-            ["/ip4/18.228.124.125/tcp/2154","/ip4/18.228.124.125/tcp/2154",
-             "/p2p/14BmPNMJvPxHMWwPkekP9AyUDVHV7DNsWkyXj9Rm4H8tqFXHYrA",
-             "/p2p/1124pWscoxuyrw7zJ8h4BxQALDwsjy1TnGgacBJKSwruZPvuk8dN",
-             "/p2p/11dc5RjiFGyfpR4zzMohRn7jqQoAqFfgRStiKnZUpVfK7sGAEdr"]
+            Failed to connect to "/p2p/11TUvYjiLf6UVqH9D1fBw6khuQQRAvvjerdwUxxR7wzRGJSu9": {invalid_address,
+                                                                                "/p2p/11TUvYjiLf6UVqH9D1fBw6khuQQRAvvjerdwUxxR7wzRGJSu9"}
+            Failed to connect to "/p2p/11CPdgTQrFbxK48DKHVAhDicDcmBYRLkASRo57qr14MbDjvJ": {invalid_address,
+                                                                                           "/p2p/11CPdgTQrFbxK48DKHVAhDicDcmBYRLkASRo57qr14MbDjvJ"}
+            Pinged "/p2p/11RhXn1sMPPiDWMPr3nSfVtJuWjTQbedRBQZF43y6MnZad1MFKJ" successfully with roundtrip time: 60 ms
+            Failed to connect to "/p2p/11bKRgGCRQXnbZya6APeC17hM4Pa3NQs4VMX6fygEhi3kPNtJPm": {invalid_address,
+                                                                                              "/p2p/11bKRgGCRQXnbZya6APeC17hM4Pa3NQs4VMX6fygEhi3kPNtJPm"}
+            Pinged "/p2p/11LTBxQ8NqMFBGtDF7UZ7rDbdhHzcDt7MHqkVDqRdn8CxwBVgkt" successfully with roundtrip time: 291 ms
+            Failed to connect to "/p2p/11gi3c3XPQUKB8LrB58BqLqdNtCsgdMuieF8JwASH5NUWSu1": {invalid_address,
+                                                                                           "/p2p/11gi3c3XPQUKB8LrB58BqLqdNtCsgdMuieF8JwASH5NUWSu1"}
 
-  /bin/bash /mnt/data/hmc_app.sh log-analyzer
+  /bin/bash hmc.sh log-analyzer
   
-          Performing actions on Node:
-          VM: miner_4633499_2090301
-          Animal Name: soaring-champagne-jellyfish
-          Log Location: /mnt/data/docker/volumes/1851574_miner-log/_data/console.log
-          ****************************************************************************
+            ****************************************************************************
+            Performing actions on Node:
+                      VM: miner_4633499_2090301
+             Animal Name: soaring-champagne-jellyfish
+            Log Location: /mnt/data/docker/volumes/1851574_miner-log/_data/console.log
+            ****************************************************************************
 
-          ******************************************************************
-          Total Witnessed:                                    = 102
-                         |-- Sending:                         = 10
-                         |-- Resending:                       = 41
-          Successful:                                         = 6  ( 5%)
-          Unreachable:                                        = 42  ( 41%)
-          Send or Re-send Failed:                             = 3  ( 2%)
-          Other (Witness Failures):                           = 51  ( 50%)
-          Challenger Issues:
-                         |-- Challenger Not Found:            = 33
-                         |-- Challenger Timed Out:            = 9
-                         |-- Challenger Refused Connection:   = 0
-                         |-- Challenger Unreachable:          = 0
-                         |-- Challenger No Listening Address: = 0
-          ******************************************************************
+            ******************************************************************
+
+            Total Witnessed:                                    = 9
+                           |-- Sending:                         = 7
+                           |-- Times Retried:                   = 22
+            Successful:                                         = 5  ( 55%)
+            Unreachable:                                        = 5  ( 55%)
+            Send or Re-send Failed:                             = 2  ( 0%)
+            Other (Witness Failures):                           = 0  ( 0%)
+
+            Challenger Issues:
+                           |-- Challenger Not Found:            = 3
+                           |-- Challenger Timed Out:            = 19
+                           |-- Challenger Refused Connection:   = 0
+                           |-- Challenger Unreachable:          = 0
+                           |-- Challenger No Listening Address: = 0
+
+            Total Peer Activity:                                = 170
+                           |-- Timeouts:                        = 77  ( 45%)
+                           |-- Proxy Session Timeouts:          = 0  ( 0%)
+                           |-- Relay Session Timeouts:          = 26  ( 15%)
+                           |-- Normal Exit:                     = 33  ( 19%)
+                           |-- Not Found:                       = 65  ( 38%)
+                           |-- Server Down:                     = 1  ( 0%)
+                           |-- Failed to Dial Proxy:            = 0  ( 0%)
+                           |-- Connection Refused:              = 0  ( 0%)
+                           |-- Connection Closed:               = 8  ( 4%)
+
+            ******************************************************************
           
           
