@@ -1,10 +1,10 @@
 #!/bin/bash
 #!/bin/sh
 #
-# spot for varaiables that will be needed
 miner_vm_name=$(balena ps | egrep "miner_" | awk '{print $NF}')
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
 get_console_log=$(find /mnt/data -name "console.log")
+wait
 total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:try_decrypt:' | grep -c ':')
 successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
 failedtodial_witnesses=$(cat $get_console_log | egrep -w 'failed to dial challenger' | awk -F'>' '{print $2,$9}' | sort -u | grep -c ':')
@@ -27,15 +27,16 @@ peer_not_found=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:'
 peer_server_down=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'server_down')
 peer_fail_dial_proxy=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'fail_dial_proxy')
 peer_econnrefused=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'econnrefused')
+wait
 #
 #
-echo "****************************************************************************"
-echo "Performing actions on Node:"
+echo "**************************************************************************************"
+echo "HMC - Helium Miner Checker (https://github.com/saad-akhtar/helium_miner_checker)"
 echo "          VM: $miner_vm_name"
 echo " Animal Name: $miner_animal_name"
 echo "Log Location: $get_console_log"
-echo "****************************************************************************"
-echo " "
+echo "      Uptime:"$(uptime)
+printf "**************************************************************************************\n"
 #
 if [ $1 == "p2p-status" ]; then
 	balena exec $miner_vm_name miner info p2p_status
@@ -50,18 +51,21 @@ elif [ $1 == "deamon-restart" ]; then
 	echo 'wait 30 seconds before running any further HMC commands to allow the miner deamon services to finish loading'
 elif [ $1 == "vm-restart" ]; then
 	balena exec $miner_vm_name miner reboot
-	echo 'wait 1 minute before running any further HMC commands to allow the miner VM to boot up again and deamon services to finish loading'
+	printf "Restarting Miner Virtual Machine. This will initiate a restart countdown"
+	wait
+	printf "\nRestart complete !!!\n"
+	printf '\nPlease wait approx 1 minute before running any further HMC commands to allow the miner VM to boot up again and deamon services to finish loading.\n\n'
 elif [ $1 == "log-analyzer" ]; then
 	sending_witnesses_sum=$(($sending_witnesses-$resending_witnesses))
-	echo '******************************************************************'
-	echo ''
+	echo 'Log Timestamp: '$(date)
+	echo "--------------------------------------------------------------------------------------"
 	echo 'Total Witnessed:                                    = '$total_witnesses
 	echo '               |-- Sending:                         = '$sending_witnesses_sum
 	echo '               |-- Times Retried:                   = '$resending_witnesses
 	echo 'Successful:                                         = '$successful_witnesses ' (' $(($successful_witnesses*100/$total_witnesses))'%)'
 	echo 'Unreachable:                                        = '$failedtodial_witnesses ' (' $(($failedtodial_witnesses*100/$total_witnesses))'%)'
-	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $((failedtosendresend_witnesses/$total_witnesses*100))'%)'
-	echo 'Other (Witness Failures):                           = '$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $(( ($sending_witnesses_sum-(+$failedtodial_witnesses+$failedtosendresend_witnesses))*100/$total_witnesses))'%)'
+	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $((failedtosendresend_witnesses*100/$total_witnesses))'%)'
+	echo 'Other (Witness Failures):                           = '$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $(( ($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses))*100/$total_witnesses))'%)'
 	echo ''
 	echo 'Challenger Issues:'
 	echo '               |-- Challenger Not Found:            = '$challenger_notfound
@@ -81,7 +85,7 @@ elif [ $1 == "log-analyzer" ]; then
 	echo '               |-- Connection Refused:              = '$peer_econnrefused ' (' $(($peer_econnrefused*100/$peer_activity_list))'%)'
 	echo '               |-- Connection Closed:               = '$peer_closed ' (' $(($peer_closed*100/$peer_activity_list))'%)'
 	echo ''
-	echo '******************************************************************'
+	echo '**************************************************************************************'
 else
 	echo "Bye"
 fi
