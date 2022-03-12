@@ -8,9 +8,9 @@
 #	echo "not...."
 #fi
 miner_vm_name=$(balena ps | egrep "miner_" | awk '{print $NF}')
-sleep 1 &
+wait -f
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
-sleep 1 &
+wait -f
 get_console_log=$(find /mnt/data -name "console.log") &
 #mapfile -t console_log < <( $get_console_log )
 wait -f
