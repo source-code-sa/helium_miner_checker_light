@@ -39,7 +39,9 @@ Preface: (app is installed in "/mnt/data/hmc_app" location on the SD card)
                               dashboard will not report any blockchain height difference nor your miner uptime on 
                               helium/sensecapmx dashboard will be disrupted.
             * vm-restart      Restart the miner virtual machine. Seems to be most effective and also necessary after any sys.config changes.
-            * log-analyzer    Miner witness/beacon/challenger/p2p statistics
+            * w               Witness stats
+            * c               Challenger stats
+            * p               Peer List stats
  
 3) /bin/bash gpp.sh           [if you wish to run the ping tool as standalone]
  
@@ -69,7 +71,7 @@ Usage Examples:
             Failed to connect to "/p2p/11gi3c3XPQUKB8LrB58BqLqdNtCsgdMuieF8JwASH5NUWSu1": {invalid_address,
                                                                                            "/p2p/11gi3c3XPQUKB8LrB58BqLqdNtCsgdMuieF8JwASH5NUWSu1"}
 
-  /bin/bash hmc.sh log-analyzer
+  /bin/bash hmc.sh w
   
             ****************************************************************************
             Performing actions on Node:
@@ -88,13 +90,36 @@ Usage Examples:
             Send or Re-send Failed:                             = 2  ( 0%)
             Other (Witness Failures):                           = 0  ( 0%)
 
+
+  /bin/bash hmc.sh c
+  
+            ****************************************************************************
+            Performing actions on Node:
+                      VM: miner_4633499_2090301
+             Animal Name: soaring-champagne-jellyfish
+            Log Location: /mnt/data/docker/volumes/1851574_miner-log/_data/console.log
+            ****************************************************************************
+
+            ******************************************************************
+
             Challenger Issues:
                            |-- Challenger Not Found:            = 3
                            |-- Challenger Timed Out:            = 19
                            |-- Challenger Refused Connection:   = 0
                            |-- Challenger Unreachable:          = 0
                            |-- Challenger No Listening Address: = 0
+                           
 
+  /bin/bash hmc.sh p
+  
+            ****************************************************************************
+            Performing actions on Node:
+                      VM: miner_4633499_2090301
+             Animal Name: soaring-champagne-jellyfish
+            Log Location: /mnt/data/docker/volumes/1851574_miner-log/_data/console.log
+            ****************************************************************************
+
+            ******************************************************************
             Total Peer Activity:                                = 170
                            |-- Timeouts:                        = 77  ( 45%)
                            |-- Proxy Session Timeouts:          = 0  ( 0%)
