@@ -41,7 +41,7 @@ Preface: (app is installed in "/mnt/data/hmc_app" location on the SD card)
             * vm-restart      Restart the miner virtual machine. Seems to be most effective and also necessary after any sys.config changes.
             * w               Witness stats
             * c               Challenger stats
-            * p               Peer List stats
+            * p               Peer List stats (this option will take up to 60 seconds to count your peerbook entries so please be patient)
  
 3) /bin/bash gpp.sh           [if you wish to run the ping tool as standalone]
  
