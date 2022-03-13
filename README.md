@@ -14,7 +14,7 @@ Installation:
 Please use the following commands to place this script in a persistent storage location. Script will be available across reboots however firmware updates will probably wipe the persistent storage clean. For this very reason i have kept the application as simple and straight forward as possible while using all of linux base utilities therefore no outside programs are needed. Even the method used for installation uses a base utility which will always be available in the miner.
 
 1) SSH into your miner
-2) Run the following: cd /mnt/data/ && mkdir hmc_app && cd hmc_app && rm -rf hmc.sh && wget https://github.com/saad-akhtar/helium_miner_checker/hmc.sh && rm -rf gpp.sh && wget https://github.com/saad-akhtar/helium_miner_checker/blob/main/gpp.sh
+2) Run the following: cd /mnt/data/ && mkdir -p hmc_app && cd hmc_app && rm -rf hmc.sh && wget https://raw.githubusercontent.com/saad-akhtar/helium_miner_checker/main/hmc.sh && rm -rf gpp.sh && wget https://raw.githubusercontent.com/saad-akhtar/helium_miner_checker/main/gpp.sh
 3) Congratulations....! Helium miner checker (HMC) is now installed and ready to rock your miner data game.....
 4) To run the application is even simpler. Check out 'apprun' section below for a full list of usage commands/switches
 
