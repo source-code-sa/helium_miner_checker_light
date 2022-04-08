@@ -27,10 +27,11 @@ total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:try_decry
 #fi
 echo "**************************************************************************************"
 echo "HMC - Helium Miner Checker (https://github.com/saad-akhtar/helium_miner_checker)"
-echo "          VM: $miner_vm_name"
-echo " Animal Name: $miner_animal_name"
-echo "Log Location: $get_console_log"
-echo "      Uptime:"$(uptime)
+echo "           VM: $miner_vm_name"
+echo "  Animal Name: $miner_animal_name"
+echo " Log Location: $get_console_log"
+echo "       Uptime:"$(uptime)
+echo 'Log Timestamp: '$(date)
 printf "**************************************************************************************\n"
 if [ $1 == "p2p-status" ]; then
 	balena exec $miner_vm_name miner info p2p_status
@@ -53,23 +54,25 @@ elif [ $1 == "vm-restart" ]; then
 elif [ $1 == "w" ]; then	
 	successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
 	successful_witnesses_perc=$(($successful_witnesses*100/$total_witnesses))
-	failedtodial_witnesses=$(cat $get_console_log | egrep -w 'failed to dial challenger' | awk -F'>' '{print $2,$9}' | sort -u | grep -c ':')
-	failedtodial_witnesses_perc=$(($failedtodial_witnesses*100/$total_witnesses))
+# This is a challenger issue and not witness
+#	failedtodial_witnesses=$(cat $get_console_log | egrep -w 'failed to dial challenger' | awk -F'>' '{print $2,$9}' | sort -u | grep -c ':')
+#	failedtodial_witnesses_perc=$(($failedtodial_witnesses*100/$total_witnesses))
 	resending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 're-sending')
 	sending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 'sending')
 	failedtosendresend_witnesses=$(cat $get_console_log | grep -c 'failed to send witness, max retry')
-	failedtosendresend_witnesses_perc=$(($failedtosendresend_witnesses*100/$total_witnesses))
+#	failedtosendresend_witnesses_perc=$(($failedtosendresend_witnesses*100/$total_witnesses))
 	sending_witnesses_sum=$(($sending_witnesses-$resending_witnesses))
-	other_witness_failure_perc=$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses)*100/$total_witnesses))
-	echo 'Log Timestamp: '$(date)
+#	other_witness_failure_perc=$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses)*100/$total_witnesses))
 	echo "--------------------------------------------------------------------------------------"
 	echo 'Total Witnessed:                                    = '$total_witnesses
-	echo '               |-- Sending:                         = '$sending_witnesses_sum
-	echo '               |-- Times Retried:                   = '$resending_witnesses
+	echo '               |-- Sent:                            = '$sending_witnesses_sum
+	echo '               |-- Retries (sending):               = '$resending_witnesses
+	echo '               |-- Max Retry Failures               = '$failedtosendresend_witnesses
 	echo 'Successful:                                         = '$successful_witnesses ' (' $successful_witnesses_perc'%)'
-	echo 'Unreachable:                                        = '$failedtodial_witnesses ' (' $failedtodial_witnesses_perc'%)'
-	echo 'Send or Re-send Failed:                             = '$failedtosendresend_witnesses ' (' $failedtosendresend_witnesses_perc'%)'
-	echo 'Other (Witness Failures):                           = '$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $other_witness_failure_perc'%)'
+# This is mostly a challenger error and not a witness issue so its a small offset in actual final counts
+#	echo 'Unreachable:                                        = '$failedtodial_witnesses ' (' $failedtodial_witnesses_perc'%)'
+	echo 'Total Failed Witnesses:                             = '$(($total_witnesses-$successful_witnesses)) ' ('$((($total_witnesses-$successful_witnesses)*100/$total_witnesses))'%)'
+#	echo 'Other (Witness Failures):                           = '$(($sending_witnesses_sum-($failedtodial_witnesses+$failedtosendresend_witnesses))) ' (' $other_witness_failure_perc'%)'
 	echo ''
 # challenger
 elif [ $1 == "c" ]; then
@@ -78,7 +81,6 @@ elif [ $1 == "c" ]; then
 	challenger_refused=$(cat $get_console_log | egrep 'econnrefused' | grep -c 'failed to dial challenger')
 	challenger_unreachable=$(cat $get_console_log | egrep 'ehostunreach' | grep -c 'failed to dial challenger')
 	challenger_nolistenaddr=$(cat $get_console_log | egrep 'no_listen_addr' | grep -c 'failed to dial challenger')
-   echo 'Log Timestamp: '$(date)
    echo "--------------------------------------------------------------------------------------"
    echo 'Challenger Issues:'
    echo '               |-- Challenger Not Found:            = '$challenger_notfound
@@ -100,9 +102,10 @@ elif [ $1 == "p" ]; then
 	peer_server_down=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'server_down')
 	peer_fail_dial_proxy=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'fail_dial_proxy')
 	peer_econnrefused=$(cat $get_console_log | egrep '@libp2p_group_worker:connecting:' | grep -c 'econnrefused')
+	wait -f
+	printf 'Standby as we sum up your miner peerbook density\n'
 	peer_book_size=$(balena exec $miner_vm_name miner peer book -c)
 	wait -f
-   echo 'Log Timestamp: '$(date)
    echo "--------------------------------------------------------------------------------------"
    echo 'Total Peer Activity:                                = '$peer_activity_list
    echo '               |-- Timeouts:                        = '$peer_timeout #' (' $(( ($peer_timeout*100)/$peer_activity_list ))'%)'
