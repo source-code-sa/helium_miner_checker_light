@@ -14,19 +14,9 @@ wait -f
 get_console_log=$(find /mnt/data -name "console.log")
 #mapfile -t console_log < <( $get_console_log )
 wait -f
-total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:try_decrypt:' | grep -c ':')
-#if [ $total_witnesses -lt 1 ]; then
-#	get_console_log=$current_console_log".0"
-#	printf 'Total witnesses returned '$total_witnesses' from todays log\n'
-#	printf 'Miner Log must have just rotated. Wait a little while and allow for the miner to collect some witnesses or creates a new challenge..!!!\n'
-#	printf 'Using yesterdays log "console.log.0"\n'
-#else
-#	#
-#	printf 'Witness count is greater than 0\n'
-#	get_console_log=$current_console_log
-#fi
+total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server_light:decrypt:' | egrep -w '240,13' | grep -c ':')
 echo "**************************************************************************************"
-echo "HMC - Helium Miner Checker (https://github.com/saad-akhtar/helium_miner_checker)"
+echo "HMC - Helium Miner Checker (https://github.com/saad-akhtar/helium_miner_checker_light)"
 echo "           VM: $miner_vm_name"
 echo "  Animal Name: $miner_animal_name"
 echo " Log Location: $get_console_log"
@@ -52,7 +42,7 @@ elif [ $1 == "vm-restart" ]; then
 	printf '\nPlease wait approx 1 minute before running any further HMC commands to allow the miner VM to boot up again and deamon services to finish loading.\n\n'
 # witnesses
 elif [ $1 == "w" ]; then	
-	successful_witnesses=$(cat $get_console_log | grep -c 'successfully sent witness to challenger')
+	successful_witnesses=$(cat $get_console_log | grep 'blockchain_poc_witness' | egrep -w '392.5' | grep -c ':')
 	successful_witnesses_perc=$(($successful_witnesses*100/$total_witnesses))
 # This is a challenger issue and not witness
 #	failedtodial_witnesses=$(cat $get_console_log | egrep -w 'failed to dial challenger' | awk -F'>' '{print $2,$9}' | sort -u | grep -c ':')
