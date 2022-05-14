@@ -12,7 +12,6 @@ wait -f
 miner_animal_name=$(balena exec $miner_vm_name miner info name)
 wait -f
 get_console_log=$(find /mnt/data -name "console.log")
-#mapfile -t console_log < <( $get_console_log )
 wait -f
 total_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server_light:decrypt:' | egrep -w '240,13' | grep -c ':')
 echo "**************************************************************************************"
@@ -44,9 +43,6 @@ elif [ $1 == "vm-restart" ]; then
 elif [ $1 == "w" ]; then	
 	successful_witnesses=$(cat $get_console_log | grep 'blockchain_poc_witness' | egrep -w '392.5' | grep -c ':')
 	successful_witnesses_perc=$(($successful_witnesses*100/$total_witnesses))
-# This is a challenger issue and not witness
-#	failedtodial_witnesses=$(cat $get_console_log | egrep -w 'failed to dial challenger' | awk -F'>' '{print $2,$9}' | sort -u | grep -c ':')
-#	failedtodial_witnesses_perc=$(($failedtodial_witnesses*100/$total_witnesses))
 	base_resending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 're-sending')
 	resending_witnesses=$((${base_resending_witnesses:0:${#base_resending_witnesses}-1}+${base_resending_witnesses:${#base_resending_witnesses}-1}))
 	sending_witnesses=$(cat $get_console_log | egrep -w '@miner_onion_server:send_witness:' | grep -c 'sending')
