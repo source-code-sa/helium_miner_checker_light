@@ -1,5 +1,7 @@
-# helium_miner_checker
-Low level management of your helium miner
+Helium Miner Checker Light
+-- working on collecting data from my miner logs to map out all vars for light hotspot activities. Light checker will be updated here. This README will be modified to accomodate any new changes/usage instructions.
+
+Low level management of your Light Helium Miner/Hotspot
 
 THis is a very simplistic bash utility to run operations on your Helium miner. So far the script is specific to SenseCAP M1 devices however i do plan to add support for other brands as i further develop this applicaiton.
 
